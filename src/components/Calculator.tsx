@@ -1,5 +1,5 @@
 import Button from "./Button";
-import { buttonsValues } from "../data/buttons";
+import { Actions, buttonsValues } from "../data/buttons";
 import { useState } from "react";
 import Display from "./Display";
 import { calculationData, historyData, stacks } from "../types/types_global";
@@ -8,7 +8,7 @@ import { calculationData, historyData, stacks } from "../types/types_global";
 
 const Calculator: React.FC = function(){
 	const [displayText, setDisplayText] = useState("0");
-	const [callStack, setCallStack] = useState<calculationData[]>([]);
+	const [callStack, setCallStack] = useState<calculationData[]>([{action: Actions.NUMBER, text: "0"}]);
 	const [historyStack, setHistoryStack] = useState<historyData[]>([]);
 
 	const stacks: stacks = {

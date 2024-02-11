@@ -3,22 +3,23 @@ import { calculationData } from "../types/types_global";
 
 export function evaluateCalculus(arr: calculationData[]): boolean{~
 	console.log(arr)
-	let arrCopy: calculationData[]  = [...arr];
-	let operationArr: number[] = [];
+	const arrCopy: calculationData[]  = [...arr];
+	const operationArr: number[] = [];
 
 	while (arrCopy.length > 0){
-		let data = arrCopy.pop();
+		const data = arrCopy.pop();
 		if(data?.action === Actions.NONE){
 			return false
 		}
 		if(data?.action === Actions.NUMBER){
+			const true_statement: boolean = true;
 			let isFloat = false;
 			let numberConcat: string = "";
 			numberConcat = data?.text;
 
 
-			while(true){
-				let result = arrCopy.pop();
+			while(true_statement){
+				const result = arrCopy.pop();
 				if(result?.action !== Actions.NUMBER && result?.action !== Actions.DOT){
 					break;
 				}
@@ -36,7 +37,7 @@ export function evaluateCalculus(arr: calculationData[]): boolean{~
 			}
 		}
 		if(data?.action === Actions.OP){
-			let temp = data.text.trim();
+			const temp = data.text.trim();
 			switch(temp){
 				case "*": {
 					break;		
@@ -58,4 +59,25 @@ export function evaluateCalculus(arr: calculationData[]): boolean{~
 
 	}
 	return false;
+}
+
+
+export function replaceLast(text: string, replaceThis:string, replacedBy:string): string{
+	let pos: number = 0;
+	const charArr: string[] = [...text];
+	let expression: string = "";
+
+	for(let i = 0; i < charArr.length-1; i++){
+		if(charArr[i] === replaceThis){
+			pos = i;
+		}
+	}
+
+	charArr[pos] = replacedBy;
+
+	for(const char of charArr){
+		expression += char;
+	}
+
+	return expression;
 }

@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { Actions, ButtonData } from "../data/buttons";
-import { calculationData, stacks } from "../types/types_global";
-import { evaluateCalculus } from "../utils/utils";
+import { stacks } from "../types/types_global";
+import { evaluateCalculus, replaceLast } from "../utils/utils";
 
 
 
@@ -28,27 +28,67 @@ const Button: React.FC<ButtonProps> = function (props: ButtonProps){
 	);
 	function on_click(): undefined{
 
-		let action = props.action;
-		let id = props.id;
+		const action = props.action;
+		const id = props.id;
 		let displayText = props.displayText;
-		let setDisplay = props.setDisplay;
-		let stacks = props.stacks;
+		const setDisplay = props.setDisplay;
+		const stacks = props.stacks;
 
-		if(action !== Actions.CLEAN && action !== Actions.EQ){
-			setDisplay(displayText + id);
+		if(action === Actions.NUMBER){
 			console.log("entered stack")
+			if(stacks.calculationStack.length === 1){
+				const res = stacks.calculationStack.pop();
+				console.log(res)
+				if(res?.text !== "0" && res !== undefined){
+					stacks.calculationStack.push(res);
+				}else{
+					displayText = "";
+				}
+			}
+			setDisplay(displayText + id);
 			stacks.calculationStack.push({action, text: id})
 			stacks.setCallStack(stacks.calculationStack);
+		}
+		else if(action === Actions.OP){
+			const res = stacks.calculationStack.pop();
+			let shouldReplace = true;
+			if(res?.action !== Actions.OP && res?.action !== Actions.DOT || 
+				res?.action === Actions.OP && id.trim() === "-" && res.text.trim() !== "+" ||
+				res?.action === Actions.OP && id.trim() === "+" && res.text.trim() !== "-"){
+				if(res !== undefined){
+					shouldReplace = false;
+					stacks.calculationStack.push(res); 
+				} 
+			}
+
+			if(res !== undefined &&  shouldReplace){
+				console.log(replaceLast(displayText, res.text, id));
+				displayText = replaceLast(displayText, res.text, id);
+			}else{
+				displayText += id;
+			}
+			setDisplay(displayText);
+			stacks.calculationStack.push({action,text:id})
 		}
 		else if(action === Actions.EQ){
 			evaluateCalculus(stacks.calculationStack)
 			console.log("calc")
 		}
 		else if(action === Actions.CLEAN){
-			console.log("clean stack")
-			stacks.calculationStack = [];
+			let curText: string = "";
+
+			stacks.calculationStack.pop();
+			if(stacks.calculationStack.length === 0){
+				stacks.calculationStack.push({action: Actions.NUMBER, text: "0"})
+			}
+			
 			stacks.setCallStack(stacks.calculationStack);
-			setDisplay("0");
+
+			for(const el of stacks.calculationStack){
+				curText += el.text;
+			}
+			
+			setDisplay(curText);
 		}
 		return undefined;
 	}
